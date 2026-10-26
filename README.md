@@ -125,6 +125,10 @@ Run the converter as an unprivileged user with a writable per-job directory, mem
 
 Do not expose the CLI as an unrestricted public file-conversion service. Any HTTP adapter needs request size limits, admission control, authentication appropriate to its environment, and job cleanup.
 
+## Complete scan and print station
+
+For the web interface, CUPS/SANE setup, scanning, preview and printer-job handling, see [NAS Office Station](https://github.com/aezizhu/nas-office-station). Its tested reference printer is the HP LaserJet MFP M437nda.
+
 ## License
 
 The wrapper source is licensed under Apache License 2.0. Renderers and fonts retain their own licenses, including AGPLv3 for ONLYOFFICE Community. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) before distributing a combined image. No proprietary Microsoft font files are included.
