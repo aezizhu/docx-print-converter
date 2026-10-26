@@ -26,7 +26,7 @@ The converter does not remove blank pages, shrink content to a target page count
 
 ## Quick start
 
-The packaged runtime has passed the NAS acceptance tests below. A clean Docker build is being verified for the first release.
+The packaged runtime passed the NAS acceptance tests below. The clean Docker image also passed both-renderer smoke tests as an unprivileged user with networking disabled and a read-only root filesystem.
 
 Build the combined image on an x86-64 Linux host:
 
@@ -106,7 +106,7 @@ python3 -m pytest
 mvn -B -ntp -f java/pom.xml verify
 ```
 
-The automated unit tests use generated public fixtures. Private customer documents, signatures, seals, credentials, and exported PDFs are excluded from this repository. Unit tests verify control flow and preservation rules; real renderer tests and page-image review are separate acceptance steps.
+The automated unit tests use generated public fixtures. The initial release passed 71 Python unit tests and 7 Java tests; the separate Docker acceptance workflow exercises both real renderers. Private customer documents, signatures, seals, credentials, and exported PDFs are excluded from this repository. Unit tests verify control flow and preservation rules; real renderer tests and page-image review are separate acceptance steps.
 
 ## Verified behavior
 
