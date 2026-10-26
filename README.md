@@ -24,6 +24,10 @@ This is a practical compatibility layer, not a guarantee of pixel-identical outp
 
 The converter does not remove blank pages, shrink content to a target page count, or silently retry a failed renderer with another engine.
 
+## Engineering findings
+
+See [Lessons learned](docs/lessons-learned.md) for the rendering failures, compatibility rules, validation methods and privacy-preserving reproductions behind this project.
+
 ## Quick start
 
 The packaged runtime passed the NAS acceptance tests below. The clean Docker image also passed both-renderer smoke tests as an unprivileged user with networking disabled and a read-only root filesystem.
