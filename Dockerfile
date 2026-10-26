@@ -4,6 +4,9 @@ WORKDIR /build
 COPY java/pom.xml ./pom.xml
 COPY java/src ./src
 RUN mvn -B -q package
+RUN jlink --module-path "$JAVA_HOME/jmods" \
+      --add-modules java.se,jdk.charsets,jdk.crypto.ec,jdk.localedata,jdk.unsupported,jdk.xml.dom,jdk.zipfs \
+      --strip-debug --no-header-files --no-man-pages --compress=2 --output /opt/jre
 
 FROM debian:bookworm-slim AS runtime
 ARG ONLYOFFICE_VERSION=10.0.0
@@ -16,10 +19,10 @@ RUN test "$(dpkg --print-architecture)" = amd64 \
  && sed -i 's|http://deb.debian.org|https://deb.debian.org|g' /etc/apt/sources.list.d/debian.sources \
  && apt-get update \
  && apt-get install -y --no-install-recommends \
-      ca-certificates curl unzip python3 python3-pip python3-venv \
-      openjdk-17-jre-headless poppler-utils fontconfig \
+      ca-certificates curl unzip python3 poppler-utils fontconfig \
       fonts-dejavu-core fonts-liberation2 fonts-noto-cjk fonts-droid-fallback \
-      fonts-arphic-uming fonts-wqy-zenhei libstdc++6 libgcc-s1 \
+      fonts-arphic-uming fonts-wqy-zenhei fonts-crosextra-carlito \
+      libstdc++6 libgcc-s1 libx11-6 libxext6 libxrender1 \
  && rm -rf /var/lib/apt/lists/*
 RUN curl -fL --retry 3 "https://github.com/ONLYOFFICE/DocumentServer/releases/download/v${ONLYOFFICE_VERSION}/onlyoffice-documentserver_amd64.deb" -o /tmp/onlyoffice.deb \
  && echo "${ONLYOFFICE_SHA256}  /tmp/onlyoffice.deb" | sha256sum -c - \
@@ -39,13 +42,14 @@ RUN cd /var/www/onlyoffice/documentserver/server/FileConverter/bin \
  && python3 /opt/docx-print-converter/scripts/prepare_onlyoffice_fonts.py "$PWD" \
  && chmod -R a+rX /var/www/onlyoffice/documentserver
 COPY --from=java-build /build/target/docx-print-converter.jar /opt/docx-print-converter/java/docx-print-converter.jar
+COPY --from=java-build /opt/jre /opt/jre
 COPY pyproject.toml LICENSE THIRD_PARTY_NOTICES.md /opt/docx-print-converter/
 COPY src /opt/docx-print-converter/src
-RUN python3 -m venv /opt/docx-print-converter/venv \
- && /opt/docx-print-converter/venv/bin/pip install --no-cache-dir /opt/docx-print-converter \
+RUN printf '#!/bin/sh\nexec python3 -m docx_print_converter.cli "$@"\n' > /usr/local/bin/docx-print-convert \
+ && chmod 755 /usr/local/bin/docx-print-convert \
  && useradd --create-home --uid 10001 converter \
  && mkdir -p /work && chown converter:converter /work
-ENV PATH="/opt/docx-print-converter/venv/bin:$PATH"
+ENV JAVA_HOME=/opt/jre PATH="/opt/jre/bin:$PATH" PYTHONPATH=/opt/docx-print-converter/src
 USER converter
 WORKDIR /work
 ENTRYPOINT ["docx-print-convert"]

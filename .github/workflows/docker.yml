@@ -1,0 +1,19 @@
+name: Docker acceptance
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build-and-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build pinned runtime
+        run: docker build -t docx-print-converter:test .
+      - name: Run both renderers offline as the image user
+        run: >-
+          docker run --rm --network none --read-only --memory 2g --pids-limit 192
+          --tmpfs /tmp:rw,exec,size=1g
+          -v "$PWD/tests/integration:/tests:ro"
+          --entrypoint python3 docx-print-converter:test /tests/smoke.py
