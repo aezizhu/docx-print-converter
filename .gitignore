@@ -1,0 +1,36 @@
+# Build products and local environments
+**/target/
+build/
+dist/
+*.egg-info/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# Local secrets and machine configuration
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# Documents and renderer artifacts must not enter the public source repository
+*.doc
+*.docx
+*.pdf
+*.png
+*.jpg
+*.jpeg
+*.tif
+*.tiff
+*.ttf
+*.ttc
+*.otf
+*.deb
+*.tar.gz
+*.zip
+.DS_Store
+.idea/
+.vscode/
